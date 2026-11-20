@@ -1,11 +1,13 @@
 import { contextBridge, ipcRenderer, shell } from 'electron'
 import pkg from '../package.json'
 
+let nextRequestId = 1
+
 export const Preload = {
 
     send(channel:string, action:string, data = {}){
         return new Promise((resolve, reject) => {
-            const requestId = Math.round(Math.random()*1000)
+            const requestId = nextRequestId++
 
             ipcRenderer.send(channel, {
                 id: requestId,
@@ -36,7 +38,7 @@ export const Preload = {
         })
     },
 
-    on(channel:string, listener){
+    on(channel:string, listener): any {
 
         const wrapEvent = (event, args) => {
             listener(event, args.action, args.data)
@@ -47,7 +49,7 @@ export const Preload = {
         return wrapEvent
     }, 
 
-    onAction(channel:string, action:string, listener){
+    onAction(channel:string, action:string, listener): any {
 
         const wrapEvent = (event, args) => {
             if(args.action === action){
